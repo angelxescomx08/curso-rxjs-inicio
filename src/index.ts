@@ -1,4 +1,4 @@
-import { Observable, Observer } from "rxjs";
+import { Observable, Observer, Subject } from "rxjs";
 
 const observer: Observer<any> = {
     next: (valor)=> console.log('next: ',valor),
@@ -6,32 +6,41 @@ const observer: Observer<any> = {
     complete: ()=> console.info('completado')
 }
 
-const intervalo$ = new Observable<number>(subscriber=>{
-
-    let count = 0;
+const intervalo$ = new Observable<number>(subs=>{
     const interval = setInterval(()=>{
-        count++;
-        subscriber.next(count);
-        console.log(count);
+        subs.next(Math.random())
     },1000);
 
-    return ()=>{
-        clearInterval(interval);
-        console.log('interval destruido: ', interval);
+    return ()=> {
+        clearTimeout(interval);
+        console.log('Intervalo destruido');
     }
 });
 
-const subscrition1 = intervalo$.subscribe(observer);
-const subscrition2 = intervalo$.subscribe(observer);
-const subscrition3 = intervalo$.subscribe(observer);
+//const subs1 = intervalo$.subscribe(rnd=>console.log('subs1: ',rnd));
+//const subs2 = intervalo$.subscribe(rnd=>console.log('subs2: ',rnd));
 
-subscrition1.add(subscrition2)
+/**
+ * Caracteristicas del subject
+ * 1. Casteo multiple para el mismo valor a varios subscribers
+ * 2. Tambien es un observer 
+ * 3. Next, error y complete
+ */
+
+const subject$ = new Subject();
+
+const subscription = intervalo$.subscribe(subject$);
+
+const subs1 = subject$.subscribe(observer);
+const subs2 = subject$.subscribe(observer);
+
+/**
+ * Cuando la data es producida por el observable en si mismo, es considerado un 'cold observable',
+ * pero cuando es producida fuera del observable es considerado 'hot observable'
+ */
 
 const timeout = setTimeout(()=>{
-    subscrition1.unsubscribe();
-    //subscrition2.unsubscribe();
-    //subscrition3.unsubscribe();
-    console.log('compleatdo');
-},3000);
-
-clearTimeout(timeout);
+    subject$.next(10);
+    subject$.complete();
+    subscription.unsubscribe();
+},3500);
