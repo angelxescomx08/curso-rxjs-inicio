@@ -1,35 +1,22 @@
-import { asyncScheduler } from "rxjs";
+import { range, fromEvent } from 'rxjs';
+import { map } from "rxjs/operators";
 
-//setTimeout(()=>{},3000)
-//setInterval(()=>{},3000)
+/*range(1,5)
+    .pipe(
+        map<number,number>(val=>val*10)
+    )
+    .subscribe( console.log )*/
 
-const saludar = ()=>console.log('Hola mundo');
-const saludar2 = (nombre)=>console.log(`Hola ${nombre}`);
-
-/**
- * COMO Timeout
- * Ejecuta una función después de cierto tiempo similar al setTimeout o al setInterval
- * @params callback: ()=>void
- * @params delay: number
- * @params state: any, solo un valor
- * @return subscription: Subscription
- */
-//asyncScheduler.schedule(saludar,2000);
-//asyncScheduler.schedule(saludar2,2000,'Angel');
-
+const keyup$ = fromEvent<KeyboardEvent>( document, 'keyup' );
 
 /**
- * COMO Inteval
- * Ejecuta una función cada cierto intervalo
- * @params callback: no puede ser una función flecha
- * @params delay: number
- * @params state: any, solo un valor
- * @return subscription: Subscription
+ * Map aplica una función dada a cada valor emitido por un observable y emite los valores 
+ * obtenidos como un observable
+ * @params funcion
+ * @return Observable<any>
  */
-const subs = asyncScheduler.schedule(function(state){
-    console.log('state: ',state);
-    this.schedule(state+1,1000);
-},3000,0);
+const keyupCode$ = keyup$.pipe(
+    map(event => event.code)
+);
 
-//setTimeout(()=> subs.unsubscribe(),6000);
-asyncScheduler.schedule(()=>subs.unsubscribe(),6000);
+keyupCode$.subscribe(console.log);
