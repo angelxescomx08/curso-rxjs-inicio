@@ -1,5 +1,5 @@
 import { range, fromEvent } from 'rxjs';
-import { map } from "rxjs/operators";
+import { map, pluck } from "rxjs/operators";
 
 /*range(1,5)
     .pipe(
@@ -19,4 +19,14 @@ const keyupCode$ = keyup$.pipe(
     map(event => event.code)
 );
 
-keyupCode$.subscribe(console.log);
+const keyupPluck$ = keyup$.pipe(
+    pluck('key')
+);
+
+const keyupPluckAnidado$ = keyup$.pipe(
+    pluck('target','baseURI')
+);
+
+keyupCode$.subscribe(code=>console.log('map',code));
+keyupPluck$.subscribe(code=>console.log('pluck',code));
+keyupPluckAnidado$.subscribe(code=>console.log('pluck anidado',code));
