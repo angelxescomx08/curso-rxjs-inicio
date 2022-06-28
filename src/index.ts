@@ -19,6 +19,10 @@ const keyupCode$ = keyup$.pipe(
     map(event => event.code)
 );
 
+/**
+ * DEPRECIADO, Devuelve una propiedad de un objeto (Se puede usar map en vez de este)
+ * @params propiedades (anidadas de tipo string)
+ */
 const keyupPluck$ = keyup$.pipe(
     pluck('key')
 );
