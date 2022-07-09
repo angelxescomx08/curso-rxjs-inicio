@@ -1,53 +1,18 @@
-import { from } from "rxjs";
-import { reduce, scan, map } from "rxjs/operators";
+import { fromEvent } from "rxjs";
+import { first, take, tap } from "rxjs/operators";
 
-const numeros = [1,2,3,4,5];
-
-const totalAcumulador = (valorAcumulado,actual)=>{
-    return valorAcumulado + actual
-}
-
-//Reduce
-from(numeros)
-.pipe(
-    reduce(totalAcumulador,0)
-)
-.subscribe(console.log);
+const click$ = fromEvent<MouseEvent>(document, 'click');
 
 /**
- * scan -Similar al reduce acumula los valores pero a diferencia
- * de reduce si emite todas las acumulaciones
- * @param callback, función acumuladora (acc,curr)
- * @param valor inicial
+ * first - Emite el primer valor o el prier valor que cumple
+ * una condición
+ * @param condición
  */
-from(numeros)
-.pipe(
-    scan(totalAcumulador,0)
+click$.pipe(
+    tap(console.log),
+    first<MouseEvent>(event => event.clientY >= 150)
 )
-.subscribe(console.log);
-
-//Redux
-interface Usuario{
-    id?: string;
-    autenticado?: boolean;
-    token?: string;
-    edad?: number;
-}
-
-const user: Usuario[] = [
-    {id: 'ang', autenticado: false, token: null},
-    {id: 'ang', autenticado: true, token: 'abc'},
-    {id: 'ang', autenticado: true, token: 'abc123'},
-];
-
-const state$ = from(user).pipe(
-    scan<Usuario>((acc,cur)=>{
-        return {...acc,...cur}
-    })
-);
-
-const id$ = state$.pipe(
-    map(state=> state.id)
-);
-
-id$.subscribe(console.log);
+.subscribe({
+    next: val => console.log('next: ', val),
+    complete: () => console.log('complete')
+});
